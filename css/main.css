@@ -1,3 +1,10 @@
+html {
+    font-family: helvetica, arial, sans-serif;
+    font-size: 16px;
+    line-height: 21px;
+    letter-spacing: 1px;
+}
+
 
 html,
 body {
@@ -18,6 +25,11 @@ body {
 .chart svg {
     width: 100%;
     height: 100%;  
+}
+
+.chart svg circle {
+    fill: #fff;
+    stroke: #000;
 }
 
 .controls {
@@ -86,6 +98,7 @@ body {
 
 #recent-colours {
     margin: 20px;
+    padding-bottom: 25px;
 }
 
 #recent-colours .swatch {
@@ -94,6 +107,33 @@ body {
     float: left;
 }
 
-#save {
+.points-control {
+    clear: left;
     float: left;
+    display: block;
+    margin: 20px 20px 0;
+    color: #7E7B7B;
+}
+
+#save {
+    clear: left;
+    float: left;
+    margin: 20px;
+    padding: 0;
+    list-style-type: none;
+    margin-bottom: 10px;
+}
+
+#save li {
+    margin-bottom: 10px;
+}
+
+#save a {
+    color: #E9E7E7;
+    text-decoration: none;
+}
+
+#save a:hover,
+#save a:focus {
+    text-decoration: underline;
 }

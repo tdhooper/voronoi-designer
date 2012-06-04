@@ -15,6 +15,9 @@ var svg = d3.select(".chart").append("svg")
     .on("mousemove", moveHandler)
     .on("mousedown", clickHandler);
 
+var cellsGroup = svg.append("g").attr("class", 'cells');
+var pointsGroup = svg.append("g").attr("class", 'points');
+
 function getPointFromId(id) {
     var gotPoint = null;
 
@@ -46,11 +49,12 @@ function moveHandler() {
     if (mode == MODE_ADD) {
         var point = d3.mouse(this);
         point.push(colour)
-        addPoint(point, false);
+        var newPoint = addPoint(point, false);
 
-        update();
-
-        removePoint(point);
+        if (newPoint) {
+            update();
+            removePoint(newPoint);
+        }
     }
 }
 
@@ -80,10 +84,11 @@ function clickHandler() {
     update();
     updateRecentColours();
     updateSaveLinks();
+    drawVertices();
 }
 
 function outHandler(e) {
-    if (d3.event.toElement == null || d3.event.toElement.parentNode != svg[0][0]) {
+    if (d3.event.toElement == null || ! jQuery.contains(svg[0][0], d3.event.toElement)) {
         update();       
     }
 }
@@ -106,7 +111,11 @@ function addPoint(newPoint, saveId) {
         }
         
         vertices.push(newPoint);
+
+        return newPoint;
     }
+
+    return null;
 }
 
 function removePoint(point) {
@@ -124,7 +133,7 @@ function update() {
 
 function drawPolys(polys) {
     if (polys.length > 0) {
-        var paths = svg.selectAll("path")
+        var paths = cellsGroup.selectAll("path")
             .data(polys)
         
         paths.enter().append("path");
@@ -134,6 +143,28 @@ function drawPolys(polys) {
             .attr("fill", function(d, i) { return vertices[i][2]; })
             .attr("id", function(d, i) { return vertices[i][3]; })
     }
+}
+
+function drawVertices() {
+    if (vertices.length > 0) {
+        var verticesPoints = [];
+        vertices.forEach(function(point, i) {
+            verticesPoints.push([
+                point[0],
+                point[1],
+            ]);
+        });
+
+        var circles = pointsGroup.selectAll("circle")
+            .data(verticesPoints)
+        
+        circles.enter().append("circle");
+        circles.exit().remove();
+
+        circles.data(verticesPoints)
+            .attr("transform", function(d) { return "translate(" + d + ")"; })
+            .attr("r", 2);    
+    }    
 }
 
 
@@ -208,6 +239,22 @@ modeControls.addEventListener("change", function(evt) {
 
 
 
+var pointControl = $(".points-control input");
+showPoints(pointControl.is(":checked"));
+pointControl.on("change", function(evt) {
+    showPoints($(evt.target).is(":checked"));
+});
+
+
+function showPoints(show) {
+    if (show) {
+        pointsGroup.attr('visibility', 'visible')
+    } else {
+        pointsGroup.attr('visibility', 'hidden')
+    }
+}
+
+
 
 
 var $downloadLink = $("#save .download a");
@@ -231,6 +278,7 @@ if (newVertices) {
     update();
     updateRecentColours();
     updateSaveLinks();
+    drawVertices();
 }
 
 
@@ -252,17 +300,13 @@ function encodeForURL() {
         v: verticesStringed
     });
 
-    console.log(saveColours)
-    console.log(saveVertices)
-    console.log(uri.toString());
-
     return uri.toString();
 }
 
 function decodeFromURL() {
     var uri = new URI();
     var params = uri.search(true);
-    console.log(params)
+
     if (params['c'] && params['v']) {
         var savedColours = params['c'];
         var savedVertices = params['v'];
@@ -271,8 +315,6 @@ function decodeFromURL() {
             var result = re.exec(pointString);
             savedVertices[i] = [parseInt(result[1]), parseInt(result[2]), savedColours[parseInt(result[3])], genID()];
         });
-
-        console.log(savedVertices)
 
         return savedVertices;
     }
