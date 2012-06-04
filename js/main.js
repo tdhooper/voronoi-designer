@@ -258,45 +258,6 @@ colourPicker.setColor("#000000");
 
 
 
-
-var modeControls = $(".mode-controls");
-modeControls.on("change", function(evt) {
-    switch (evt.target.value) {
-        case "add":
-            mode = MODE_ADD;
-            break;
-        case "remove":
-            mode = MODE_REMOVE;
-            break;
-        case "move":
-            mode = MODE_MOVE;
-            break;            
-        case "colour":
-            mode = MODE_COLOUR;
-            break;
-    }
-});
-
-
-
-var pointControl = $(".points-control input");
-showPoints(pointControl.is(":checked"));
-pointControl.on("change", function(evt) {
-    showPoints($(evt.target).is(":checked"));
-});
-
-
-function showPoints(show) {
-    if (show) {
-        pointsGroup.attr('visibility', 'visible')
-    } else {
-        pointsGroup.attr('visibility', 'hidden')
-    }
-}
-
-
-
-
 var $downloadLink = $("#save .download a");
 var $saveLink = $("#save .editor a");
 
@@ -361,7 +322,41 @@ function decodeFromURL() {
 
 
 
+var modeControls = $(".mode-controls");
+modeControls.on("change", function(evt) {
+    switch (evt.target.value) {
+        case "add":
+            mode = MODE_ADD;
+            break;
+        case "remove":
+            mode = MODE_REMOVE;
+            break;
+        case "move":
+            mode = MODE_MOVE;
+            break;            
+        case "colour":
+            mode = MODE_COLOUR;
+            break;
+    }
+});
 
+
+
+var pointControl = $(".points-control input");
+showPoints(pointControl.is(":checked"));
+pointControl.on("change", function(evt) {
+    showPoints($(evt.target).is(":checked"));
+});
+
+
+function showPoints(show) {
+    if (show) {
+        pointsGroup.attr('visibility', 'visible')
+    } else {
+        pointsGroup.attr('visibility', 'hidden')
+    }
+    updateSaveLinks();
+}
 
 
 
