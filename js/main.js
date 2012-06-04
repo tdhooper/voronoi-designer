@@ -3,17 +3,20 @@ var cellIDCount = 0;
 
 var MODE_ADD = 0;
 var MODE_REMOVE = 1;
-var MODE_COLOUR = 2;
+var MODE_MOVE = 2;
+var MODE_COLOUR = 3;
 
 var mode = MODE_ADD;
 
 var colour;
 var coloursUsed = [];
+var pointToMove;
 
 var svg = d3.select(".chart").append("svg")
     .on("mouseout", outHandler)
     .on("mousemove", moveHandler)
-    .on("mousedown", clickHandler);
+    .on("mousedown", mousedownHandler)
+    .on("mouseup", mouseupHandler);
 
 var cellsGroup = svg.append("g").attr("class", 'cells');
 var pointsGroup = svg.append("g").attr("class", 'points');
@@ -46,19 +49,29 @@ function generateVoronoiPolys(vertices) {
 }
 
 function moveHandler() {
-    if (mode == MODE_ADD) {
-        var point = d3.mouse(this);
-        point.push(colour)
-        var newPoint = addPoint(point, false);
+    switch (mode) {
+        case MODE_ADD:
+            var point = d3.mouse(this);
+            point.push(colour)
+            var newPoint = addPoint(point, false);
 
-        if (newPoint) {
-            update();
-            removePoint(newPoint);
-        }
+            if (newPoint) {
+                update();
+                removePoint(newPoint);
+            }
+            break;
+        case MODE_MOVE:
+            if (pointToMove) {
+                var mousePoint = d3.mouse(this);
+                pointToMove[0] = mousePoint[0];
+                pointToMove[1] = mousePoint[1];
+                update();
+            }
+            break;
     }
 }
 
-function clickHandler() {
+function mousedownHandler() {
     switch (mode) {
         case MODE_ADD:
             var newPoint = d3.mouse(this);
@@ -72,6 +85,13 @@ function clickHandler() {
                 removePoint(point);    
             }
             break;
+        case MODE_MOVE:
+            var id = d3.event.target.getAttribute('id');
+            var point = getPointFromId(id);
+            if (point) {
+                startMovingPoint(point);    
+            }
+            break;            
         case MODE_COLOUR:
             var id = d3.event.target.getAttribute('id');
             var point = getPointFromId(id);
@@ -84,7 +104,14 @@ function clickHandler() {
     update();
     updateRecentColours();
     updateSaveLinks();
-    drawVertices();
+}
+
+function mouseupHandler() {
+    stopMovingPoint();    
+
+    update();
+    updateRecentColours();
+    updateSaveLinks();    
 }
 
 function outHandler(e) {
@@ -122,6 +149,15 @@ function removePoint(point) {
     vertices.splice(vertices.indexOf(point), 1);
 }
 
+function startMovingPoint(point) {
+    pointToMove = point;
+}
+
+function stopMovingPoint() {
+    pointToMove = null;
+}
+
+
 function colourPoint(point, colour) {
     point[2] = colour;
 }
@@ -129,6 +165,7 @@ function colourPoint(point, colour) {
 function update() {
     var voronoiPolys = generateVoronoiPolys(vertices);
     drawPolys(voronoiPolys);
+    drawVertices();
 }
 
 function drawPolys(polys) {
@@ -222,8 +259,8 @@ colourPicker.setColor("#000000");
 
 
 
-var modeControls = document.getElementsByClassName("mode-controls")[0];
-modeControls.addEventListener("change", function(evt) {
+var modeControls = $(".mode-controls");
+modeControls.on("change", function(evt) {
     switch (evt.target.value) {
         case "add":
             mode = MODE_ADD;
@@ -231,6 +268,9 @@ modeControls.addEventListener("change", function(evt) {
         case "remove":
             mode = MODE_REMOVE;
             break;
+        case "move":
+            mode = MODE_MOVE;
+            break;            
         case "colour":
             mode = MODE_COLOUR;
             break;
@@ -278,7 +318,6 @@ if (newVertices) {
     update();
     updateRecentColours();
     updateSaveLinks();
-    drawVertices();
 }
 
 
