@@ -1,0 +1,99 @@
+
+html,
+body {
+    height: 100%;
+    margin: 0;
+    background: #E9E7E7;    
+}
+
+
+.chart {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.chart svg {
+    width: 100%;
+    height: 100%;  
+}
+
+.controls {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 230px;
+    color: #fff;
+    background: #141313;
+    border-radius: 2px;     
+}
+
+.mode-controls label {
+    overflow: hidden;
+    display: block;
+    width: 50px;
+    height: 50px;
+    float: left;
+    position: relative;
+    margin: 20px 0 20px 20px;
+}
+
+.mode-controls input {
+    margin-left: -50px;
+    cursor: hand;   
+    cursor: pointer;    
+}
+
+.mode-controls input:before {
+    position: absolute;
+    top: 0;
+    left: 0;
+
+    font-size: 34px;
+    text-align: center;
+
+    width: 50px;
+    height: 50px;
+    line-height: 51px;
+
+    background: #666363;
+    border-radius: 2px; 
+}
+
+.mode-controls input:checked:before,
+.mode-controls input:checked:hover:before,
+.mode-controls input:checked:focus:before {
+    background: #E9E7E7;
+}
+
+.mode-controls input:hover:before,
+.mode-controls input:focus:before {
+    background-color: #7E7B7B;
+}
+
+.mode-controls span {
+    overflow: hidden;
+    text-indent: -200px;
+    display: block;
+}
+
+#colourpicker {
+    clear: left;
+    margin-left: 17px;
+}
+
+#recent-colours {
+    margin: 20px;
+}
+
+#recent-colours .swatch {
+    width: 38px;
+    height: 38px;
+    float: left;
+}
+
+#save {
+    float: left;
+}
