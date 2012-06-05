@@ -22,6 +22,7 @@
                 <label><input class="icon-minus" type="radio" name="mode" value="remove" /><span> Remove cell</span></label>
                 <label><input class="icon-move" type="radio" name="mode" value="move" /><span> Move cell</span></label>
                 <label><input class="icon-tint colour" type="radio" name="mode" value="colour" /><span> Colour cell</span></label>
+                <label><input class="icon-info-sign" type="radio" name="mode" value="inspect" /><span> Inspect cell</span></label>
             </div>
 
             <div id="colourpicker"></div>
@@ -33,6 +34,11 @@
                 <li class="download"><a href="">Download SVG</a></li>
                 <li class="editor"><a href="">Save in URL</a></li>
             </ul>
+        </div>
+
+        <div class="inspect-dialog hidden">
+            <div class="shape"></div>
+            <div class="data"></div>
         </div>
 
 		<script src="js/main.js"></script>

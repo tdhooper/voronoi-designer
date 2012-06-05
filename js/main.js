@@ -5,12 +5,14 @@ var MODE_ADD = 0;
 var MODE_REMOVE = 1;
 var MODE_MOVE = 2;
 var MODE_COLOUR = 3;
+var MODE_INSPECT = 4;
 
 var mode = MODE_ADD;
 
 var colour;
 var coloursUsed = [];
 var pointToMove;
+var inspectedPoint;
 
 var svg = d3.select(".chart").append("svg")
     .on("mouseout", outHandler)
@@ -20,6 +22,9 @@ var svg = d3.select(".chart").append("svg")
 
 var cellsGroup = svg.append("g").attr("class", 'cells');
 var pointsGroup = svg.append("g").attr("class", 'points');
+
+var inspectSvg = d3.select(".inspect-dialog .shape").append("svg");
+var $inspectSvg = $(inspectSvg[0][0]);
 
 function getPointFromId(id) {
     var gotPoint = null;
@@ -74,49 +79,69 @@ function moveHandler() {
 function mousedownHandler() {
     switch (mode) {
         case MODE_ADD:
-            var newPoint = d3.mouse(this);
-            newPoint.push(colour);
-            addPoint(newPoint);  
+            var point = d3.mouse(this);
+            point.push(colour);
+            newPoint = addPoint(point);  
+
+            if (newPoint) {
+                update();
+                updateRecentColours();
+                updateSaveLinks();                
+            }
             break;
+
         case MODE_REMOVE:
-            var id = d3.event.target.getAttribute('id');
-            var point = getPointFromId(id);
+            var point = getPoint();
             if (point) {
-                removePoint(point);    
+                removePoint(point);  
+
+                update();
+                updateRecentColours();
+                updateSaveLinks();                
             }
             break;
+
         case MODE_MOVE:
-            var id = d3.event.target.getAttribute('id');
-            var point = getPointFromId(id);
+            var point = getPoint();
             if (point) {
-                startMovingPoint(point);    
+                startMovingPoint(point);
             }
-            break;            
+            break;   
+
         case MODE_COLOUR:
-            var id = d3.event.target.getAttribute('id');
-            var point = getPointFromId(id);
+            var point = getPoint();
             if (point) {
                 colourPoint(point, colour);
+
+                update();
+                updateRecentColours();
+                updateSaveLinks();                
+            }
+            break;
+
+        case MODE_INSPECT:
+            var point = getPoint();
+            if (point) {
+                inspectPoint(point);
             }
             break;
     }
-    
-    update();
-    updateRecentColours();
-    updateSaveLinks();
+
+    function getPoint() {
+        var id = d3.event.target.getAttribute('id');
+        return getPointFromId(id);
+    }
 }
 
 function mouseupHandler() {
-    stopMovingPoint();    
-
-    update();
-    updateRecentColours();
-    updateSaveLinks();    
+    stopMovingPoint();   
 }
 
 function outHandler(e) {
     if (d3.event.toElement == null || ! jQuery.contains(svg[0][0], d3.event.toElement)) {
-        update();       
+        if (mode == MODE_ADD) {
+            update();
+        }
     }
 }
 
@@ -157,10 +182,155 @@ function stopMovingPoint() {
     pointToMove = null;
 }
 
-
 function colourPoint(point, colour) {
     point[2] = colour;
 }
+
+function inspectPoint(point) {
+    uninspectPoint();
+    var path = $("#"+point[3]).eq(0);
+    path.attr('class', 'inspect');
+    var parent = path.parent();
+    parent.append(path);
+    inspectedPoint = point;
+
+    var margin = 60;
+
+    var points = getPointsFromPathString(path.attr("d"));
+    var box = [
+        [margin, margin],
+        [$inspectSvg.width() - margin, $inspectSvg.height() - margin]
+    ];
+    var inspectPoints = fitPointsToBox(points, box);
+
+    var d = "M";
+    inspectPoints.forEach(function(point, i) {
+        if (i != 0) {
+            d += "L";    
+        }
+        d += point[0] + "," + point[1]
+    });
+    d += "Z";
+
+    $inspectSvg.empty();
+    inspectSvg.append("path").attr('d', d);
+
+
+    var lines = [];
+    points.forEach(function(point, i) {
+        var j = (i < points.length - 1) ? i + 1 : 0;
+        lines.push([{
+                x: points[i][0],
+                y: points[i][1]
+            },{
+                x: points[j][0],
+                y: points[j][1]
+        }]);
+    });
+
+    var measurements = [];
+    lines.forEach(function(line, i) {
+        var j = (i < lines.length - 1) ? i + 1 : 0;
+        measurements.push({
+            len: Math.sqrt(Math.pow(line[1].x - line[0].x, 2) + Math.pow(line[1].y - line[0].y, 2)),
+            angle: 180 - ((180/Math.PI) * angleBetweenTwoLines(lines[i], lines[j]))
+        })
+    });
+
+    function angleBetweenTwoLines(line1, line2) {
+        var x1 = line1[0].x - line1[1].x;
+        var y1 = line1[0].y - line1[1].y;
+        var x2 = line2[0].x - line2[1].x;
+        var y2 = line2[0].y - line2[1].y;
+
+        return Math.acos(
+                (x1 * x2 + y1 * y2) / 
+                ( Math.sqrt(Math.pow(x1, 2) + Math.pow(y1, 2)) * Math.sqrt(Math.pow(x2, 2) + Math.pow(y2, 2)))
+            );
+    }
+
+    $data = $(".inspect-dialog .data").empty();
+    $ol = $("<ol></ol>");
+    measurements.forEach(function(m, i) {
+        $ul = $("<ul></ul>");
+        $ul.append('<li>Length: '+m.len+'</li>');
+        $ul.append('<li>Angle: '+m.angle+'&deg;</li>');
+        $data.append($ul);    
+    });
+    $data.append($ol);
+    $(".inspect-dialog").removeClass('hidden');
+}
+
+function uninspectPoint() {
+    if (inspectedPoint) {
+        var path = $("#"+inspectedPoint[3]).eq(0);
+        path.attr('class', '');    
+        inspectedPoint = null;
+    }
+    $(".inspect-dialog").addClass('hidden');
+}
+
+function getPointsFromPathString(pathString) {
+    var points = pathString.slice(1, -1);
+    var points = points.split('L');
+    points.forEach(function(item, i) {
+        points[i] = item.split(',');
+        points[i][0] = parseInt(points[i][0]);
+        points[i][1] = parseInt(points[i][1]);
+    });
+
+    return points;
+}
+
+function fitPointsToBox(points, box) {
+    
+    var boundingBox = getBoundingBox(points);
+    var newPoints = [];
+
+    // Scale
+    var width = boundingBox[1][0] - boundingBox[0][0];
+    var height = boundingBox[1][1] - boundingBox[0][1];
+    var scale;
+    if (width > height) {
+        scale = (box[1][0] - box[0][0]) / width;
+    } else {
+        scale = (box[1][1] - box[0][1]) / height;
+    }
+    points.forEach(function(point, i) {
+        newPoints[i] = [point[0] * scale, point[1] * scale];
+    });
+
+
+    // Move
+    boundingBox = getBoundingBox(newPoints);
+    var moveX = box[0][0] - boundingBox[0][0];
+    var moveY = box[0][1] - boundingBox[0][1];
+
+    newPoints.forEach(function(point, i) {
+        newPoints[i] = [point[0] + moveX, point[1] + moveY];
+    });
+
+    return newPoints;
+}
+
+
+function getBoundingBox(points) {
+    var xMin, xMax, yMin, yMax;
+
+    points.forEach(function(point) {
+        xMin = xMin ? Math.min(point[0], xMin) : point[0];
+        xMax = xMax ? Math.max(point[0], xMax) : point[0];
+        yMin = yMin ? Math.min(point[1], yMin) : point[1];
+        yMax = yMax ? Math.max(point[1], yMax) : point[1];
+    });
+
+    return [
+        [xMin, yMin],
+        [xMax, yMax]
+    ];
+}
+
+
 
 function update() {
     var voronoiPolys = generateVoronoiPolys(vertices);
@@ -337,7 +507,12 @@ modeControls.on("change", function(evt) {
         case "colour":
             mode = MODE_COLOUR;
             break;
+        case "inspect":
+            mode = MODE_INSPECT;
+            break;
     }
+
+    uninspectPoint();
 });
 
 

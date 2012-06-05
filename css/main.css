@@ -33,6 +33,12 @@ body {
     stroke: #000;
 }
 
+.chart svg .inspect {
+    stroke: yellow;
+    stroke-width: 5px;
+}
+
+
 .controls {
     position: absolute;
     top: 10px;
@@ -51,8 +57,8 @@ body {
 .mode-controls label {
     overflow: hidden;
     display: block;
-    width: 47px;
-    height: 47px;
+    width: 38px;
+    height: 38px;
     float: left;
     position: relative;
 }
@@ -68,12 +74,12 @@ body {
     top: 0;
     left: 0;
 
-    font-size: 34px;
+    font-size: 23px;
     text-align: center;
 
-    width: 47px;
-    height: 47px;
-    line-height: 49px;
+    width: 38px;
+    height: 38px;
+    line-height: 41px;
 
     background: #666363;
 }
@@ -155,3 +161,29 @@ body {
 #save a:focus {
     text-decoration: underline;
 }
+
+
+.inspect-dialog {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    color: #fff;
+    background: #141313;
+    border-radius: 2px;   
+}
+
+.inspect-dialog svg {
+    width: 300px;
+    height: 300px;
+    margin: 20px;
+}
+
+.inspect-dialog svg path {
+    fill: #fff;
+    stroke: transparent;
+}
+
+.inspect-dialog.hidden {
+    display: none;
+}
+
