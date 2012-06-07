@@ -135,6 +135,7 @@ function mousedownHandler() {
 
 function mouseupHandler() {
     stopMovingPoint();   
+    updateSaveLinks();
 }
 
 function outHandler(e) {
