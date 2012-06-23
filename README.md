@@ -1,6 +1,9 @@
 voronoi-designer
 ================
 
+* **By me** [Graffiti](), [Spectrum](), [Twirl]()
+* **By [@2DForever](http://twitter.com/2DForever)** [Virtua Fighter]()
+
 Tools Used
 ----------
 
