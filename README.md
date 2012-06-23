@@ -1,7 +1,7 @@
 voronoi-designer
 ================
 
-[stainlessvision.com/lab/voronoi-designer/](stainlessvision.com/lab/voronoi-designer/)
+[http://www.stainlessvision.com/lab/voronoi-designer/](http://www.stainlessvision.com/lab/voronoi-designer/)
 
 Examples
 --------
