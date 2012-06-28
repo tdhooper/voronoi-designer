@@ -444,6 +444,7 @@ function updateSaveLinks() {
     });
 }
 
+
 newVertices = decodeFromURL();
 if (newVertices) {
     vertices = newVertices;
@@ -493,8 +494,10 @@ function decodeFromURL() {
 
 
 
-var modeControls = $(".mode-controls");
-modeControls.on("change", function(evt) {
+var $modeControls = $(".mode-controls");
+$modeControls.on("change", function(evt) {
+    $modeControls.find('label').removeClass('checked');
+    $(evt.target).parent().addClass('checked');
     switch (evt.target.value) {
         case "add":
             mode = MODE_ADD;

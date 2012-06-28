@@ -69,7 +69,11 @@ body {
     cursor: pointer;    
 }
 
-.mode-controls input:before {
+.mode-controls label {
+    color: #000;
+}
+
+.mode-controls label:before {
     position: absolute;
     top: 0;
     left: 0;
@@ -84,23 +88,23 @@ body {
     background: #666363;
 }
 
-.mode-controls label:first-child input:before {
+.mode-controls label:first-child:before {
     border-radius: 2px 0 0 2px; 
 }
 
-.mode-controls label:last-child input:before {
+.mode-controls label:last-child:before {
     border-radius: 0 2px 2px 0; 
 }
 
 
-.mode-controls input:checked:before,
-.mode-controls input:checked:hover:before,
-.mode-controls input:checked:focus:before {
+.mode-controls label.checked:before,
+.mode-controls label.checked:hover:before,
+.mode-controls label.checked:focus:before {
     background: #E9E7E7;
 }
 
-.mode-controls input:hover:before,
-.mode-controls input:focus:before {
+.mode-controls label:hover:before,
+.mode-controls label:focus:before {
     background-color: #7E7B7B;
 }
 
