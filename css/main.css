@@ -49,6 +49,16 @@ body {
     border-radius: 2px;   
 }
 
+.controls a {
+    color: #E9E7E7;
+    text-decoration: none;
+}
+
+.controls a:hover,
+.controls a:focus {
+    text-decoration: underline;
+}
+
 .mode-controls {
     margin: 20px;
     float: left;
@@ -138,7 +148,6 @@ body {
     float: left;
     display: block;
     margin: 20px 20px 0;
-    color: #7E7B7B;
     cursor: hand;   
     cursor: pointer;        
 }
@@ -156,16 +165,13 @@ body {
     margin-bottom: 10px;
 }
 
-#save a {
-    color: #E9E7E7;
-    text-decoration: none;
+a.forkme {
+    color: #7E7B7B;
+    font-size: 0.8em;
+    clear: both;
+    display: block;
+    margin: 20px;
 }
-
-#save a:hover,
-#save a:focus {
-    text-decoration: underline;
-}
-
 
 .inspect-dialog {
     position: absolute;
